@@ -1,5 +1,8 @@
 import sys 
-from enum import Enum
+from mode_verb import MODE_VERB
+from protocol_rules import PhoneBook 
+
+
 
 class NotSpecifiedIPOrPortError(Exception):
     """Error that occurs when there is not Server or Port"""
@@ -48,7 +51,11 @@ def client_run() -> None:
                 "Запускать надо так:\n"
                 "python3.10 client.py arsxak.ru 80"
                 )
-    print(get_mode())
+    
+    client = PhoneBook(server, port)
+    print(client)
+    verb = MODE_VERB.get(get_mode())
+    print(verb)
 
 
 
