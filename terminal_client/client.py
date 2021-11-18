@@ -1,5 +1,5 @@
-import sys 
-from mode_verb import MODE_VERB
+import sys
+from mode_verb import MODE_VERB, Verb_Request
 from protocol_rules import PhoneBook 
 
 
@@ -7,6 +7,11 @@ from protocol_rules import PhoneBook
 class NotSpecifiedIPOrPortError(Exception):
     """Error that occurs when there is not Server or Port"""
     pass
+
+class CanNotParseResponseError(Exception):
+     """Error that occurs when we can not parse some strange 
+     response from RKSOK server."""
+     pass
 
 def process_critical_exception(message: str):
     """Print message about critical situation and exit"""
@@ -53,11 +58,21 @@ def client_run() -> None:
                 )
     
     client = PhoneBook(server, port)
-    print(client)
     verb = MODE_VERB.get(get_mode())
-    print(verb)
-
-
+    client.set_verb(verb)
+    client.set_name(input("Введите имя:"))
+    if verb == Verb_Request.WRITE:
+        client.set_phone(input("Введите телефон: "))
+    try:
+        human_readable_response = client.process()
+    except CanNotParseResponseError:
+        procces_critical_exeption(
+                "Не понял ответ от сервера"
+                )
+    print(f"\nЗапрос: {client.get_raw_request()!r}\n"
+          f"Ответ:{client.get_raw_response()!r}\n")
+    print(human_readable_response)
+    
 
 if __name__ == "__main__":
     client_run()
