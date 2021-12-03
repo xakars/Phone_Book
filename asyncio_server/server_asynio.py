@@ -11,14 +11,14 @@ DELETE = 'УДОЛИ'
 STATUS_OK = 'НОРМАЛДЫКС РКСОК/1.0'
 STATUS_BAD_REQUEST = 'НИПОНЯЛ РКСОК/1.0'
 STATUS_NOT_FOUND = 'НИНАШОЛ РКСОК/1.0'
-data = b''
 
 
-async def handle_echo(reader, writer):
+async def listen_client(reader, writer):
+    data = b''
     while True:
         global data
         tmp_data = await reader.read(1024)
-        if tmp_data.decode() == '' or b'\r\n\r\n' in tmp_data:
+        if not tmp_data or tmp_data.endswith(b'\r\n\r\n'):
             data += tmp_data
             break
         else:
@@ -53,7 +53,7 @@ async def handle_echo(reader, writer):
 
 async def main():
     server = await asyncio.start_server(
-            handle_echo, '0.0.0.0', 80)
+            listen_client, '0.0.0.0', 80) #need to keep in config('host', port)
 
     addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
     print(f'Serving on {addrs}')
